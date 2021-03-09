@@ -1,1 +1,1 @@
-# teleplayer-bot
+# teleplayer-bot-api
