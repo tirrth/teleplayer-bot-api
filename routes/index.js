@@ -71,7 +71,7 @@ var download = function (url, dest, callback) {
     .get(url, function (response) {
       response.pipe(file);
       file.on("finish", function () {
-        file.close(callback); // close() is async, call cb after close completes.
+        file.close(callback({ success: "File downloaded Successfully.", url })); // close() is async, call cb after close completes.
       });
     })
     .on("error", function (err) {
@@ -95,7 +95,7 @@ router.get("/get-stream-tape-url", async (req, res, next) => {
 
   const url = `https://www.${textContent?.substr(2)}`;
   download(url, __dirname + "/../public/stylesheets/hey.mp4", (response) => {
-    res.status(200).send({ url, response: `${response}` });
+    res.status(200).send({ url, response });
   });
   // await axios
   //   .get(url)
