@@ -94,10 +94,6 @@ router.get("/get-stream-tape-url", async (req, res, next) => {
   await browser.close();
 
   const url = `https://www.${textContent?.substr(2)}`;
-  let httpsRes;
-  https.get(url, function (response) {
-    httpsRes = response;
-  });
   download(url, __dirname + "/../public/stylesheets/hey.mp4", (response) => {
     res.status(200).send({ url, response: `${response}` });
   });
