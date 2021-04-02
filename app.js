@@ -40,7 +40,7 @@ app.use(function (err, req, res, next) {
 const { TELEGRAM_BOT_TOKEN, TELEGRAM_BOT_API_SERVER } = require("./config");
 const TelegramBot = require("node-telegram-bot-api");
 
-// replace the value below with the Telegram token you receive from @BotFather
+// Replace the value below with the Telegram token you receive from @BotFather
 // Create a bot that uses 'polling' to fetch new updates
 const bot = new TelegramBot(TELEGRAM_BOT_TOKEN, {
   polling: true,
@@ -48,13 +48,31 @@ const bot = new TelegramBot(TELEGRAM_BOT_TOKEN, {
 });
 
 // Listen for any kind of message. There are different kinds of messages.
-bot.on("message", (msg) => {
+bot.on("message", async (msg) => {
   const chatId = msg.chat.id;
-  console.log("----------------------");
+  // console.log("----------------------");
   console.log(msg);
-  console.log("----------------------");
+  bot.sendMessage(chatId, `${chatId} Received your message before file`);
+  // console.log("----------------------");
   // bot.sendDocument(chatId, 'BQACAgUAAxkBAAMwYEjEVPwi3vMRD8tqM06Bq6DwMVcAAhoCAALmr0BWNwaUwVQk_VgeBA');
-  bot.sendMessage(chatId, `${chatId} Received your message`);
+  // BQACAgUAAxkBAAMwYEjEVPwi3vMRD8tqM06Bq6DwMVcAAhoCAALmr0BWNwaUwVQk_VgeBA - 54 mb
+  // BQACAgEAAxkBAAIBX2BNgF51dkuITqjo8FVuc3P-zhTLAAILAAOLxPlHlYIOj8IEIeAeBA - 300mb
+  // BAACAgUAAxkBAAPrYEn3HsNxhFOvh-w6DJfHKms0t7AAAm8LAAKmlVFWOb4AAYv-3A4-HgQ - 3.5mb
+  // BQACAgQAAxkBAAIB92BYl-RV3jRKMQu0nzkKUrySiVGqAAI3AgAC8kY4UqTuVcy7pKYvHgQ
+  await bot
+    .getFile(
+      "BQACAgUAAxkBAAMwYEjEVPwi3vMRD8tqM06Bq6DwMVcAAhoCAALmr0BWNwaUwVQk_VgeBA"
+    )
+    .then((res) => console.log(res))
+    .catch((err) => console.log(err));
+
+  // bot.downloadFile("")
+  // `${this.options.baseApiUrl}/file/bot${this.token}/${resp.file_path}`
+  // bot.downloadFile('BQACAgEAAxkBAAOsYEnmYBYf02qlhXbyD_DPBZHmkFsAAgsAA4vE-UeVgg6PwgQh4B4E', './public/files').then(res => console.log(res)).catch(err => console.log(err));
+  bot.sendMessage(chatId, `${chatId} Received your message after file`);
+  // bot.sendAnimation(chatId, 'https://media3.giphy.com/media/ZBQhoZC0nqknSviPqT/giphy.gif?cid=ecf05e47ria5x2m9p3yr98kbgt5fvai1kyprbe6n6p95mpna&rid=giphy.gif');
+
+  // bot.deleteMessage()
 });
 
 module.exports = app;
