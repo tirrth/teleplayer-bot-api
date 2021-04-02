@@ -75,7 +75,6 @@ var download = function (url, dest, callback) {
           callback({
             success: true,
             message: "File downloaded Successfully.",
-            url,
           })
         ); // close() is async, call cb after close completes.
       });
@@ -88,7 +87,7 @@ var download = function (url, dest, callback) {
 };
 
 router.get("/get-stream-tape-url", async (req, res, next) => {
-  // --------------------------------------------- using web-scrapper ---------------------------------------------- //
+  // --------------------------------------------- puppeteer web-scrapper implementation ---------------------------------------------- //
   const browser = await puppeteer.launch({
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
     headless: true,
@@ -98,41 +97,21 @@ router.get("/get-stream-tape-url", async (req, res, next) => {
   const [el] = await page.$x('//*[@id="videolink"]');
   const textContent = await page.evaluate((el) => el.textContent, el);
   await browser.close();
-
   const url = `https://www.${textContent?.substr(2)}`;
   axios
     .head(url)
     .then((response) => {
       download(
-        response.request?.res
-          ?.responseUrl /* "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" */,
+        response.request?.res?.responseUrl,
         __dirname + "/../public/stylesheets/hey.mp4",
         (response) => {
-          res.status(200).send({ url, response });
+          res.status(200).send({ url, ...response });
         }
       );
     })
     .catch((err) => {
       res.status(400).send({ err, success: false });
     });
-
-  // --------------------------------------------- using HTTP request ---------------------------------------------- //
-  // axios
-  //   .get(req.query?.url)
-  //   .then((response) => {
-  //     // console.log(response);
-  //     const doc = parse(response.data);
-  //     res.status(200).send({
-  //       response: {
-  //         url: `https://www.${doc
-  //           .querySelector("#videolink")
-  //           ?.textContent?.substr(2)}`,
-  //       },
-  //     });
-  //   })
-  //   .catch((err) => {
-  //     res.status(400).send({ err: err.response });
-  //   });
 });
 
 router.get("/play-stream-tape-video", async (req, res, next) => {
