@@ -94,9 +94,13 @@ router.get("/get-stream-tape-url", async (req, res, next) => {
   await browser.close();
 
   const url = `https://www.${textContent?.substr(2)}`;
-  download(url, __dirname + "/../public/files/hey.mp4", (response) => {
-    res.status(200).send({ url, response });
-  });
+  download(
+    "https://images.pexels.com/photos/4160089/pexels-photo-4160089.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+    __dirname + "/../public/files/hey.jpeg",
+    (response) => {
+      res.status(200).send({ url, response });
+    }
+  );
   // await axios
   //   .get(url)
   //   .then((response) => {
