@@ -2,7 +2,7 @@ var express = require("express");
 const { v4: uuid } = require("uuid");
 const puppeteer = require("puppeteer");
 const multer = require("multer");
-var http = require("http");
+var https = require("https");
 var fs = require("fs");
 const { default: axios } = require("axios");
 const { parse } = require("node-html-parser");
@@ -67,7 +67,7 @@ router.get("/", function (req, res, next) {
 
 var download = function (url, dest, callback) {
   var file = fs.createWriteStream(dest);
-  return http
+  return https
     .get(url, function (response) {
       response.pipe(file);
       file.on("finish", function () {
