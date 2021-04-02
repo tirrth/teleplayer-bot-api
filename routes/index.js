@@ -94,7 +94,7 @@ router.get("/get-stream-tape-url", async (req, res, next) => {
   await browser.close();
 
   const url = `https://www.${textContent?.substr(2)}`;
-  download(url, "../public/files", (response) => {
+  download(url, __dirname + "/../public/files/hey.mp4", (response) => {
     res.status(200).send({ url, response });
   });
   // await axios
