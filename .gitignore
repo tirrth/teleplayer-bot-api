@@ -2,6 +2,9 @@
 #
 node_modules/
 
+# public files
+public/files/
+
 # .env
 #
 .env
