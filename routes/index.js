@@ -100,23 +100,21 @@ router.get("/get-stream-tape-url", async (req, res, next) => {
   await browser.close();
 
   const url = `https://www.${textContent?.substr(2)}`;
-  download(
-    "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-    __dirname + "/../public/stylesheets/hey.mp4",
-    (response) => {
-      res.status(200).send({ url, response });
-    }
-  );
-  // await axios
-  //   .get(url)
-  //   .then((response) => {
-  //     console.log(response);
-  //     res.status(200).send({ url, response });
-  //   })
-  //   .catch((err) => {
-  //     console.log("Error => ", err);
-  //     res.status(400).send({ url, err });
-  //   });
+  axios
+    .head(url)
+    .then((response) => {
+      download(
+        response.request?.res
+          ?.responseUrl /* "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" */,
+        __dirname + "/../public/stylesheets/hey.mp4",
+        (response) => {
+          res.status(200).send({ url, response });
+        }
+      );
+    })
+    .catch((err) => {
+      res.status(400).send({ err, success: false });
+    });
 
   // --------------------------------------------- using HTTP request ---------------------------------------------- //
   // axios
