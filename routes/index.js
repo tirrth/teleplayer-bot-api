@@ -74,7 +74,14 @@ router.get("/get-stream-tape-url", async (req, res, next) => {
   const [el] = await page.$x('//*[@id="videolink"]');
   const textContent = await page.evaluate((el) => el.textContent, el);
   await browser.close();
-  res.status(200).send({ url: `https://www.${textContent?.substr(2)}` });
+
+  const url = `https://www.${textContent?.substr(2)}`;
+  axios
+    .get(url)
+    .then((res) => console.log(res))
+    .catch((err) => console.log("Error => ", err));
+
+  res.status(200).send({ url });
 
   // --------------------------------------------- using HTTP request ---------------------------------------------- //
   // axios
@@ -149,23 +156,20 @@ router.get("/play-stream-tape-video", async (req, res, next) => {
   //   };
   //   request(options).pipe(res);
   // }
-
   // axios
   //   .head(
   //     "https://www.streamtape.com/get_video?id=qro9VX69Jrszp71&expires=1617411573&ip=F0OPKRgOKxSHDN&token=lIOWHKeLrfzZ"
   //   )
   //   .then((res) => console.log(res))
   //   .catch((err) => console.log("Error => ", err));
-
   // res.render("video", { url: req.query?.path });
-
-  const browser = await puppeteer.launch();
-  const page = await browser.newPage();
-  await page.goto(
-    "https://www.streamtape.com/get_video?id=qro9VX69Jrszp71&expires=1617434580&ip=F0OPKRgOKxSHDN&token=9QDZaBAq6uzZ"
-  );
-  await browser.close();
-  res.status(200).send({ success: true });
+  // const browser = await puppeteer.launch();
+  // const page = await browser.newPage();
+  // await page.goto(
+  //   "https://www.streamtape.com/get_video?id=qro9VX69Jrszp71&expires=1617434580&ip=F0OPKRgOKxSHDN&token=9QDZaBAq6uzZ"
+  // );
+  // await browser.close();
+  // res.status(200).send({ success: true });
 });
 
 router.post("/downloadPost", upload.single("file"), function (req, res) {
