@@ -76,12 +76,16 @@ router.get("/get-stream-tape-url", async (req, res, next) => {
   await browser.close();
 
   const url = `https://www.${textContent?.substr(2)}`;
-  axios
+  await axios
     .get(url)
-    .then((res) => console.log(res))
-    .catch((err) => console.log("Error => ", err));
-
-  res.status(200).send({ url });
+    .then((res) => {
+      console.log(res);
+      res.status(200).send({ url, res });
+    })
+    .catch((err) => {
+      console.log("Error => ", err);
+      res.status(400).send({ url, err });
+    });
 
   // --------------------------------------------- using HTTP request ---------------------------------------------- //
   // axios
