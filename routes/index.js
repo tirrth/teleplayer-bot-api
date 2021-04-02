@@ -66,7 +66,8 @@ router.get("/", function (req, res, next) {
 router.get("/get-stream-tape-url", async (req, res, next) => {
   // --------------------------------------------- using web-scrapper ---------------------------------------------- //
   const browser = await puppeteer.launch({
-    args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    args: ["--no-sandbox"],
+    headless: true,
   });
   const page = await browser.newPage();
   await page.goto(req.query?.url);
