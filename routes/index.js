@@ -2,6 +2,8 @@ var express = require("express");
 const { v4: uuid } = require("uuid");
 const puppeteer = require("puppeteer");
 const multer = require("multer");
+var http = require("http");
+var fs = require("fs");
 const { default: axios } = require("axios");
 const { parse } = require("node-html-parser");
 const storage = multer.diskStorage({
@@ -63,6 +65,22 @@ router.get("/", function (req, res, next) {
   res.render("index", { title: "TelePlayer Bot" });
 });
 
+var download = function (url, dest, callback) {
+  var file = fs.createWriteStream(dest);
+  return http
+    .get(url, function (response) {
+      response.pipe(file);
+      file.on("finish", function () {
+        file.close(callback); // close() is async, call cb after close completes.
+      });
+    })
+    .on("error", function (err) {
+      // Handle errors
+      fs.unlink(dest); // Delete the file async. (But we don't check the result)
+      if (callback) callback(err.message);
+    });
+};
+
 router.get("/get-stream-tape-url", async (req, res, next) => {
   // --------------------------------------------- using web-scrapper ---------------------------------------------- //
   const browser = await puppeteer.launch({
@@ -76,16 +94,19 @@ router.get("/get-stream-tape-url", async (req, res, next) => {
   await browser.close();
 
   const url = `https://www.${textContent?.substr(2)}`;
-  await axios
-    .get(url)
-    .then((response) => {
-      console.log(response);
-      res.status(200).send({ url, response });
-    })
-    .catch((err) => {
-      console.log("Error => ", err);
-      res.status(400).send({ url, err });
-    });
+  download(url, "../public/files", (response) => {
+    res.status(200).send({ url, response });
+  });
+  // await axios
+  //   .get(url)
+  //   .then((response) => {
+  //     console.log(response);
+  //     res.status(200).send({ url, response });
+  //   })
+  //   .catch((err) => {
+  //     console.log("Error => ", err);
+  //     res.status(400).send({ url, err });
+  //   });
 
   // --------------------------------------------- using HTTP request ---------------------------------------------- //
   // axios
