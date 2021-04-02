@@ -96,7 +96,7 @@ router.get("/get-stream-tape-url", async (req, res, next) => {
   const url = `https://www.${textContent?.substr(2)}`;
   download(
     "https://images.pexels.com/photos/4160089/pexels-photo-4160089.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
-    __dirname + "/../public/files/hey.jpeg",
+    __dirname + "/../public/stylesheets/hey.jpeg",
     (response) => {
       res.status(200).send({ url, response });
     }
