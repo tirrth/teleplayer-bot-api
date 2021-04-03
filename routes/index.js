@@ -104,7 +104,7 @@ var downloadFile = function (url, dest, callback) {
 };
 
 let download = async function (uri, filename) {
-  let command = `curl ${filename} -o ${uri}`;
+  let command = `curl ${uri} -o ${filename}`;
   cp.execSync(command);
 };
 
