@@ -17,6 +17,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 const router = express.Router();
+const cp = require("child_process");
 
 // var readStream = createReadStream(
 //   __dirname + "/../public/files/AgADGgIAAuavQFY.mp4"
@@ -29,6 +30,7 @@ const router = express.Router();
 // });
 
 // https://betterprogramming.pub/video-stream-with-node-js-and-html5-320b3191a6b6
+// https://youtu.be/ZjBLbXUuyWg
 
 // app.get('/video', function(req, res) {
 //   const path = 'assets/sample.mp4'
@@ -65,25 +67,45 @@ router.get("/", function (req, res, next) {
   res.render("index", { title: "TelePlayer Bot" });
 });
 
-var download = function (url, dest, callback) {
+var downloadFile = function (url, dest, callback) {
   var file = fs.createWriteStream(dest);
-  return https
-    .get(url, function (response) {
-      response.pipe(file);
-      file.on("finish", function () {
-        file.close(
-          callback({
-            success: true,
-            message: "File downloaded Successfully.",
-          })
-        ); // close() is async, call cb after close completes.
-      });
-    })
-    .on("error", function (err) {
-      // Handle errors
-      fs.unlink(dest); // Delete the file async. (But we don't check the result)
-      if (callback) callback(err.message);
+  const httpsRequest = https.get(url, (response) => {
+    if (response.statusCode != 200) {
+      return callback({ err: "Response status was " + response.statusCode });
+    }
+    response.pipe(file);
+
+    // close() is async, call cb after close completes.
+    file.on("finish", function () {
+      file.close(
+        callback({
+          success: true,
+          message: "File downloaded Successfully.",
+        })
+      );
     });
+  });
+
+  httpsRequest.on("error", function (err) {
+    // Handle errors
+    fs.unlink(dest); // Delete the file async. (But we don't check the result)
+    if (callback) {
+      return callback(err);
+    }
+  });
+
+  file.on("error", (err) => {
+    // Handle errors
+    fs.unlink(dest); // Delete the file async. (But we don't check the result)
+    if (callback) {
+      return callback(err);
+    }
+  });
+};
+
+let download = async function (uri, filename) {
+  let command = `curl -o ${filename}  '${uri}'`;
+  let result = cp.execSync(command);
 };
 
 router.get("/get-stream-tape-url", async (req, res, next) => {
@@ -100,14 +122,19 @@ router.get("/get-stream-tape-url", async (req, res, next) => {
   const url = `https://www.${textContent?.substr(2)}`;
   axios
     .head(url)
-    .then((response) => {
-      download(
+    .then(async (response) => {
+      // downloadFile(
+      //   response.request?.res?.responseUrl,
+      //   __dirname + "/../public/stylesheets/hey.mp4",
+      //   (response) => {
+      //     res.status(200).send({ url, ...response });
+      //   }
+      // );
+      await download(
         response.request?.res?.responseUrl,
-        __dirname + "/../public/stylesheets/hey.mp4",
-        (response) => {
-          res.status(200).send({ url, ...response });
-        }
+        __dirname + "/../public/stylesheets/hey.mp4"
       );
+      res.status(200).send({ url });
     })
     .catch((err) => {
       res.status(400).send({ err, success: false });
