@@ -104,8 +104,8 @@ var downloadFile = function (url, dest, callback) {
 };
 
 let download = async function (uri, filename) {
-  let command = `curl -o ${filename}  '${uri}'`;
-  let result = cp.execSync(command);
+  let command = `curl ${filename} -o ${uri}`;
+  cp.execSync(command);
 };
 
 router.get("/get-stream-tape-url", async (req, res, next) => {
