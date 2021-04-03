@@ -123,6 +123,7 @@ router.get("/get-stream-tape-url", async (req, res, next) => {
   axios
     .head(url)
     .then(async (response) => {
+      // --------------------- download file using https core module --------------------- //
       // downloadFile(
       //   response.request?.res?.responseUrl,
       //   __dirname + "/../public/stylesheets/hey.mp4",
@@ -130,8 +131,10 @@ router.get("/get-stream-tape-url", async (req, res, next) => {
       //     res.status(200).send({ url, ...response });
       //   }
       // );
+
+      // --------------------- download file using child_process core module (Keeping it here just for learning purpose, not know how it works exactly otherwise) --------------------- //
       await download(
-        response.request?.res?.responseUrl,
+        "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
         __dirname + "/../public/stylesheets/hey.mp4"
       );
       res.status(200).send({ url });
