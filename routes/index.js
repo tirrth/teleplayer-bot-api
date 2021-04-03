@@ -29,6 +29,7 @@ const cp = require("child_process");
 //   res.status(200).send();
 // });
 
+// ------------ References ------------ //
 // https://betterprogramming.pub/video-stream-with-node-js-and-html5-320b3191a6b6
 // https://youtu.be/ZjBLbXUuyWg
 
@@ -63,11 +64,7 @@ const cp = require("child_process");
 //   }
 // });
 
-router.get("/", function (req, res, next) {
-  res.render("index", { title: "TelePlayer Bot" });
-});
-
-var downloadFile = function (url, dest, callback) {
+const downloadFileWithHTTPS = function (url, dest, callback) {
   var file = fs.createWriteStream(dest);
   const httpsRequest = https.get(url, (response) => {
     if (response.statusCode != 200) {
@@ -103,10 +100,14 @@ var downloadFile = function (url, dest, callback) {
   });
 };
 
-let download = async function (uri, filename) {
+const downloadFileWithCurl = async function (uri, filename) {
   let command = `curl ${uri} -o ${filename}`;
   cp.execSync(command);
 };
+
+router.get("/", function (req, res, next) {
+  res.render("index", { title: "TelePlayer Bot" });
+});
 
 router.get("/get-stream-tape-url", async (req, res, next) => {
   // --------------------------------------------- puppeteer web-scrapper implementation ---------------------------------------------- //
@@ -124,20 +125,20 @@ router.get("/get-stream-tape-url", async (req, res, next) => {
     .head(url)
     .then(async (response) => {
       // --------------------- download file using https core module --------------------- //
-      // downloadFile(
-      //   response.request?.res?.responseUrl,
-      //   __dirname + "/../public/stylesheets/hey.mp4",
-      //   (response) => {
-      //     res.status(200).send({ url, ...response });
-      //   }
-      // );
-
-      // --------------------- download file using child_process core module (Keeping it here just for learning purpose, not know how it works exactly otherwise) --------------------- //
-      await download(
-        "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-        __dirname + "/../public/stylesheets/hey.mp4"
+      downloadFileWithHTTPS(
+        response.request?.res?.responseUrl,
+        __dirname + "/../public/stylesheets/hey.mp4",
+        (response) => {
+          res.status(200).send({ url, ...response });
+        }
       );
-      res.status(200).send({ url });
+
+      // --------------------- download file using child_process core module (Keeping it here just for learning purpose) --------------------- //
+      // await downloadFileWithCurl(
+      //   response.request?.res?.responseUrl,
+      //   __dirname + "/../public/stylesheets/hey.mp4"
+      // );
+      // res.status(200).send({ url });
     })
     .catch((err) => {
       res.status(400).send({ err, success: false });
