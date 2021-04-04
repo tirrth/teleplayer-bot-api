@@ -126,15 +126,15 @@ router.get("/", function (req, res, next) {
 });
 
 router.get("/play-video", function (req, res, next) {
-  res.render("stream-tape-video", { url: req.query?.url });
+  res.render("stream-tape-video", { url: decodeURI(req.query?.url) });
 });
 
 router.get("/play-remote-video", function (req, res, next) {
-  got.stream(req.query?.rvu).pipe(res);
+  got.stream(decodeURI(req.query?.rvu)).pipe(res);
 });
 
 router.get("/get-streamtape-video-url", async (req, res, next) => {
-  _getStreamtapeVideoUrl(req.query?.url)
+  _getStreamtapeVideoUrl(decodeURI(req.query?.url))
     .then((response) => {
       res.status(200).send({
         success: true,
@@ -151,7 +151,7 @@ router.get("/get-streamtape-video-url", async (req, res, next) => {
 });
 
 router.get("/play-streamtape-video", async (req, res, next) => {
-  _getStreamtapeVideoUrl(req.query?.url)
+  _getStreamtapeVideoUrl(decodeURI(req.query?.url))
     .then((response) => {
       got.stream(response.request?.res?.responseUrl).pipe(res);
 
