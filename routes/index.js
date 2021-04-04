@@ -15,6 +15,7 @@ const storage = multer.diskStorage({
     callback(null, req.body?.file_unique_id || `${uuid()}`);
   },
 });
+const got = require("got");
 const upload = multer({ storage });
 const router = express.Router();
 const cp = require("child_process");
@@ -109,6 +110,10 @@ router.get("/", function (req, res, next) {
   res.render("index", { title: "TelePlayer Bot" });
 });
 
+router.get("/play-stream-tape-video", function (req, res, next) {
+  res.render("stream-tape-video", { url: req.query?.url });
+});
+
 router.get("/get-stream-tape-url", async (req, res, next) => {
   // --------------------------------------------- puppeteer web-scrapper implementation ---------------------------------------------- //
   const browser = await puppeteer.launch({
@@ -123,15 +128,17 @@ router.get("/get-stream-tape-url", async (req, res, next) => {
   const url = `https://www.${textContent?.substr(2)}`;
   axios
     .head(url)
-    .then(async (response) => {
+    .then((response) => {
+      got.stream(response.request?.res?.responseUrl).pipe(res);
+
       // --------------------- download file using https core module --------------------- //
-      downloadFileWithHTTPS(
-        response.request?.res?.responseUrl,
-        __dirname + "/../public/stylesheets/hey.mp4",
-        (response) => {
-          res.status(200).send({ url, ...response });
-        }
-      );
+      // downloadFileWithHTTPS(
+      //   response.request?.res?.responseUrl,
+      //   __dirname + "/../public/stylesheets/hey.mp4",
+      //   (response) => {
+      //     res.status(200).send({ url, ...response });
+      //   }
+      // );
 
       // --------------------- download file using child_process core module (Keeping it here just for learning purpose) --------------------- //
       // await downloadFileWithCurl(
