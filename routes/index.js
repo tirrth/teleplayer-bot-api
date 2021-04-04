@@ -138,11 +138,13 @@ router.get("/get-streamtape-video-url", async (req, res, next) => {
     .then((response) => {
       res.status(200).send({
         success: true,
-        streamtape_video_url: `${req.protocol}://${
-          req.headers.host
-        }/play-remote-video?rvu=${encodeURI(
-          response.request?.res?.responseUrl
-        )}`,
+        streamtape_video_url: response.request?.res?.responseUrl
+          ? `${req.protocol}://${
+              req.headers.host
+            }/play-remote-video?rvu=${encodeURI(
+              response.request?.res?.responseUrl
+            )}`
+          : "",
       });
     })
     .catch((err) => {
