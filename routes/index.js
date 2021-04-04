@@ -5,7 +5,6 @@ const multer = require("multer");
 var https = require("https");
 var fs = require("fs");
 const { default: axios } = require("axios");
-const { parse } = require("node-html-parser");
 const storage = multer.diskStorage({
   destination: function (req, file, callback) {
     callback(null, "public/files");
