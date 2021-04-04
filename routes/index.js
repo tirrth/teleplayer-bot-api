@@ -130,7 +130,7 @@ router.get("/play-video", function (req, res, next) {
 });
 
 router.get("/play-remote-video", function (req, res, next) {
-  got.stream(req.headers["remote-video-url"]).pipe(res);
+  got.stream(req.query?.rvu).pipe(res);
 });
 
 router.get("/get-streamtape-video-url", async (req, res, next) => {
@@ -138,7 +138,11 @@ router.get("/get-streamtape-video-url", async (req, res, next) => {
     .then((response) => {
       res.status(200).send({
         success: true,
-        streamtape_video_url: response.request?.res?.responseUrl,
+        streamtape_video_url: `${req.protocol}://${
+          req.headers.host
+        }/play-remote-video?rvu=${encodeURI(
+          response.request?.res?.responseUrl
+        )}`,
       });
     })
     .catch((err) => {
