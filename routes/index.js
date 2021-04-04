@@ -110,11 +110,11 @@ router.get("/", function (req, res, next) {
   res.render("index", { title: "TelePlayer Bot" });
 });
 
-router.get("/play-stream-tape-video", function (req, res, next) {
+router.get("/play-video", function (req, res, next) {
   res.render("stream-tape-video", { url: req.query?.url });
 });
 
-router.get("/get-stream-tape-url", async (req, res, next) => {
+router.get("/play-stream-tape-video", async (req, res, next) => {
   // --------------------------------------------- puppeteer web-scrapper implementation ---------------------------------------------- //
   const browser = await puppeteer.launch({
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
@@ -150,76 +150,6 @@ router.get("/get-stream-tape-url", async (req, res, next) => {
     .catch((err) => {
       res.status(400).send({ err, success: false });
     });
-});
-
-router.get("/play-stream-tape-video", async (req, res, next) => {
-  // let movieStream = fs.createReadStream(req.query?.path);
-  // movieStream.on("open", function () {
-  //   res.writeHead(206, {
-  //     "Content-Range": "bytes " + start + "-" + end + "/" + total,
-  //     "Accept-Ranges": "bytes",
-  //     "Content-Length": chunksize,
-  //     "Content-Type": "video/mp4",
-  //   });
-  //   // This just pipes the read stream to the response object (which goes
-  //   //to the client)
-  //   movieStream.pipe(res);
-  // });
-  // movieStream.on("error", function (err) {
-  //   res.end(err);
-  // });
-  // var fileUrl = req.query?.path;
-  // var range = req?.headers.range;
-  // var positions, start, end, total, chunksize;
-  // // HEAD request for file metadata
-  // request(
-  //   {
-  //     url: fileUrl,
-  //     method: "HEAD",
-  //   },
-  //   function (error, response, body) {
-  //     console.log(response, fileUrl);
-  //     setResponseHeaders(response.headers);
-  //     pipeToResponse();
-  //   }
-  // );
-  // function setResponseHeaders(headers) {
-  //   positions = range.replace(/bytes=/, "").split("-");
-  //   start = parseInt(positions[0], 10);
-  //   total = headers["content-length"];
-  //   end = positions[1] ? parseInt(positions[1], 10) : total - 1;
-  //   chunksize = end - start + 1;
-  //   res.writeHead(206, {
-  //     "Content-Range": "bytes " + start + "-" + end + "/" + total,
-  //     "Accept-Ranges": "bytes",
-  //     "Content-Length": chunksize,
-  //     "Content-Type": "video/mp4",
-  //   });
-  // }
-  // function pipeToResponse() {
-  //   var options = {
-  //     url: fileUrl,
-  //     headers: {
-  //       range: "bytes=" + start + "-" + end,
-  //       connection: "keep-alive",
-  //     },
-  //   };
-  //   request(options).pipe(res);
-  // }
-  // axios
-  //   .head(
-  //     "https://www.streamtape.com/get_video?id=qro9VX69Jrszp71&expires=1617411573&ip=F0OPKRgOKxSHDN&token=lIOWHKeLrfzZ"
-  //   )
-  //   .then((res) => console.log(res))
-  //   .catch((err) => console.log("Error => ", err));
-  // res.render("video", { url: req.query?.path });
-  // const browser = await puppeteer.launch();
-  // const page = await browser.newPage();
-  // await page.goto(
-  //   "https://www.streamtape.com/get_video?id=qro9VX69Jrszp71&expires=1617434580&ip=F0OPKRgOKxSHDN&token=9QDZaBAq6uzZ"
-  // );
-  // await browser.close();
-  // res.status(200).send({ success: true });
 });
 
 router.post("/downloadPost", upload.single("file"), function (req, res) {
