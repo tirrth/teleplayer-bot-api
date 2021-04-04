@@ -106,6 +106,21 @@ const downloadFileWithCurl = async function (uri, filename) {
   cp.execSync(command);
 };
 
+const _getStreamtapeVideoUrl = async (streamtape_video_link) => {
+  // --------------------------------------------- puppeteer web-scrapper implementation ---------------------------------------------- //
+  const browser = await puppeteer.launch({
+    args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    headless: true,
+  });
+  const page = await browser.newPage();
+  await page.goto(streamtape_video_link);
+  const [el] = await page.$x('//*[@id="videolink"]');
+  const textContent = await page.evaluate((el) => el.textContent, el);
+  await browser.close();
+  const url = `https://www.${textContent?.substr(2)}`;
+  return axios.head(url);
+};
+
 router.get("/", function (req, res, next) {
   res.render("index", { title: "TelePlayer Bot" });
 });
@@ -114,20 +129,25 @@ router.get("/play-video", function (req, res, next) {
   res.render("stream-tape-video", { url: req.query?.url });
 });
 
-router.get("/play-stream-tape-video", async (req, res, next) => {
-  // --------------------------------------------- puppeteer web-scrapper implementation ---------------------------------------------- //
-  const browser = await puppeteer.launch({
-    args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    headless: true,
-  });
-  const page = await browser.newPage();
-  await page.goto(req.query?.url);
-  const [el] = await page.$x('//*[@id="videolink"]');
-  const textContent = await page.evaluate((el) => el.textContent, el);
-  await browser.close();
-  const url = `https://www.${textContent?.substr(2)}`;
-  axios
-    .head(url)
+router.get("/play-remote-video", function (req, res, next) {
+  got.stream(req.headers["remote-video-url"]).pipe(res);
+});
+
+router.get("/get-streamtape-video-url", async (req, res, next) => {
+  _getStreamtapeVideoUrl(req.query?.url)
+    .then((response) => {
+      res.status(200).send({
+        success: true,
+        streamtape_video_url: response.request?.res?.responseUrl,
+      });
+    })
+    .catch((err) => {
+      res.status(400).send({ err, success: false });
+    });
+});
+
+router.get("/play-streamtape-video", async (req, res, next) => {
+  _getStreamtapeVideoUrl(req.query?.url)
     .then((response) => {
       got.stream(response.request?.res?.responseUrl).pipe(res);
 
